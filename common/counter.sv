@@ -1,20 +1,21 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: Polikarpov D. A.
 // 
 // Create Date: 23.08.2025 10:23:27
 // Design Name: 
 // Module Name: BRAM
-// Project Name: 
+// Project Name: common_module
 // Target Devices: 
 // Tool Versions: 
 // Description: 
-// 
+// * Basic counter
 // Dependencies: 
 // 
 // Revision:
 // Revision 0.01 - File Created
+//          0.02 - First version of module
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +34,7 @@ module counter
     // Declarations
     logic [COUNTER_WIDTH - 1 : 0] cn = '0;
     // -----------------------------------------------
-    // 
+    // Basic logic
     always_ff @(posedge i_clk) begin : counter_logic
         if (i_reset) begin
             cn <= '0;
@@ -45,6 +46,7 @@ module counter
         end
     end : counter_logic
     // -----------------------------------------------
+    // Assign block
     assign o_value = cn;
     
 endmodule : counter
