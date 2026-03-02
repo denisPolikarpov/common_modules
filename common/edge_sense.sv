@@ -15,6 +15,7 @@
 // 
 // Revision:
 // Revision 0.01 - File Created
+// Revision 0.02 - First version of module
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
@@ -48,3 +49,15 @@ module edge_sense
         assign o_detect = signal_delayed ^ i_signal ? 1'b1 : 1'b0;
     end
 endmodule : edge_sense
+/*
+    edge_sense
+    #(
+        .EDGE_TO_DETECT ( "BOTH" ) // "RISING" // "FALLING" // "BOTH"
+    )
+    edge_sense_inst
+    (
+        .i_clk    ( ),
+        .i_signal ( ),
+        .o_detect ( )
+    );
+*/
