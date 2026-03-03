@@ -45,6 +45,8 @@ module comporator
     logic compare_results;
     logic signed [INPUT_WIDTH - 1 : 0] compare_with;
     
+    logic optional_output_register = '0;
+    
     if (CONSTANT_OR_SIGNAL == "CONSTANT") begin
         assign compare_with = COMPARE_CONSTANT;
     end
@@ -72,12 +74,15 @@ module comporator
     // Output logic
     if (REGISTER_OUTPUT == "REGISTER") begin
         always_ff @(posedge i_clk) begin : register
-            o_compare_results <= compare_results;
+            optional_output_register <= compare_results;
         end : register
+        
+        assign o_compare_results = optional_output_register;
     end
     else if (REGISTER_OUTPUT == "NO-REGISTER") begin
         assign o_compare_results = compare_results;
     end
+    
 endmodule : comporator
 /*
     comporator
