@@ -17,19 +17,22 @@
 // Revision 0.01 - File Created
 //          0.02 - First version of module
 //          0.03 - Parameter final value
+//          0.04 - Port final value
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
 module counter
 #(
-    parameter int unsigned COUNTER_WIDTH = 8,
-    parameter int unsigned FINAL_VALUE   = 20
+    parameter int unsigned COUNTER_WIDTH      = 8,
+    parameter              FINAL_VALUE_SOURCE = "PARAMETER", // "PARAMETER"  // "PORT"
+    parameter int unsigned FINAL_VALUE        = 20
 )
 (
     input  logic                         i_clk,
     input  logic                         i_reset,
     input  logic                         i_enable,
+    input  logic [COUNTER_WIDTH - 1 : 0] i_final_value,
     output logic [COUNTER_WIDTH - 1 : 0] o_value
 );
     // -----------------------------------------------
@@ -53,21 +56,40 @@ module counter
         end
     end : counter_logic
     
-    comporator
-    #(
-        .INPUT_WIDTH        ( COUNTER_WIDTH ),
-        .OPPERATION_TYPE    (      "EQ"     ),  // "GT"  // "GEQ"  // "LT"  // "LEQ"  // "EQ"
-        .CONSTANT_OR_SIGNAL (   "CONSTANT"  ),  // "CONSTANT"  // "SIGNAL"
-        .COMPARE_CONSTANT   (  FINAL_VALUE  ),
-        .REGISTER_OUTPUT    ( "NO-REGISTER" )   // "REGISTER"  // "NO-REGISTER"
-    )
-    comporator_inst
-    (
-        .i_clk,
-        .i_signal          (          cn         ),
-        .i_compare_with    (          '0         ),
-        .o_compare_results ( final_value_reached )
-    );
+    if (FINAL_VALUE_SOURCE == "PARAMETER") begin
+        comporator
+        #(
+            .INPUT_WIDTH        ( COUNTER_WIDTH ),
+            .OPPERATION_TYPE    (      "EQ"     ),  // "GT"  // "GEQ"  // "LT"  // "LEQ"  // "EQ"
+            .CONSTANT_OR_SIGNAL (   "CONSTANT"  ),  // "CONSTANT"  // "SIGNAL"
+            .COMPARE_CONSTANT   (  FINAL_VALUE  ),
+            .REGISTER_OUTPUT    ( "NO-REGISTER" )   // "REGISTER"  // "NO-REGISTER"
+        )
+        comporator_parameter_final_value
+        (
+            .i_clk,
+            .i_signal          (          cn         ),
+            .i_compare_with    (          '0         ),
+            .o_compare_results ( final_value_reached )
+        );
+    end
+    else if (FINAL_VALUE_SOURCE == "PORT") begin
+        comporator
+        #(
+            .INPUT_WIDTH        ( COUNTER_WIDTH ),
+            .OPPERATION_TYPE    (      "EQ"     ),  // "GT"  // "GEQ"  // "LT"  // "LEQ"  // "EQ"
+            .CONSTANT_OR_SIGNAL (    "SIGNAL"   ),  // "CONSTANT"  // "SIGNAL"
+            .COMPARE_CONSTANT   (  FINAL_VALUE  ),
+            .REGISTER_OUTPUT    ( "NO-REGISTER" )   // "REGISTER"  // "NO-REGISTER"
+        )
+        comporator_port_final_value
+        (
+            .i_clk,
+            .i_signal          (          cn         ),
+            .i_compare_with    (    i_final_value    ),
+            .o_compare_results ( final_value_reached )
+        );
+    end
     // -----------------------------------------------
     // Assign block
     assign o_value = cn;
@@ -76,7 +98,9 @@ endmodule : counter
 /*
     counter
     #(
-        .COUNTER_WIDTH ( 8 )   
+        .COUNTER_WIDTH      (      8      ),
+        .FINAL_VALUE_SOURCE ( "PARAMETER" ), // "PARAMETER"  // "PORT"
+        .FINAL_VALUE        (     20      )
     )
     counter_inst
     (
