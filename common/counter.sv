@@ -104,9 +104,10 @@ endmodule : counter
     )
     counter_inst
     (
-        .i_clk    ( ),
-        .i_reset  ( ),
-        .i_enable ( ),
-        .o_value  ( )
+        .i_clk         ( ),
+        .i_reset       ( ),
+        .i_enable      ( ),
+        .i_final_value ( ),
+        .o_value       ( )
     );
 */
