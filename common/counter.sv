@@ -16,13 +16,15 @@
 // Revision:
 // Revision 0.01 - File Created
 //          0.02 - First version of module
+//          0.03 - Parameter final value
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
 module counter
 #(
-    parameter int unsigned COUNTER_WIDTH = 8 
+    parameter int unsigned COUNTER_WIDTH = 8,
+    parameter int unsigned FINAL_VALUE   = 20
 )
 (
     input  logic                         i_clk,
@@ -33,10 +35,15 @@ module counter
     // -----------------------------------------------
     // Declarations
     logic [COUNTER_WIDTH - 1 : 0] cn = '0;
+    logic final_value_reached,
+          counter_reset;
+    
     // -----------------------------------------------
     // Basic logic
+    assign counter_reset = i_reset || final_value_reached;
+    
     always_ff @(posedge i_clk) begin : counter_logic
-        if (i_reset) begin
+        if (counter_reset) begin
             cn <= '0;
         end
         else begin
@@ -45,6 +52,22 @@ module counter
             end
         end
     end : counter_logic
+    
+    comporator
+    #(
+        .INPUT_WIDTH        ( COUNTER_WIDTH ),
+        .OPPERATION_TYPE    (      "EQ"     ),  // "GT"  // "GEQ"  // "LT"  // "LEQ"  // "EQ"
+        .CONSTANT_OR_SIGNAL (   "CONSTANT"  ),  // "CONSTANT"  // "SIGNAL"
+        .COMPARE_CONSTANT   (  FINAL_VALUE  ),
+        .REGISTER_OUTPUT    ( "NO-REGISTER" )   // "REGISTER"  // "NO-REGISTER"
+    )
+    comporator_inst
+    (
+        .i_clk,
+        .i_signal          (          cn         ),
+        .i_compare_with    (          '0         ),
+        .o_compare_results ( final_value_reached )
+    );
     // -----------------------------------------------
     // Assign block
     assign o_value = cn;
