@@ -25,21 +25,24 @@
 module counter
 #(
     parameter int unsigned COUNTER_WIDTH      = 8,
-    parameter              FINAL_VALUE_SOURCE = "PARAMETER", // "PARAMETER"  // "PORT"
-    parameter int unsigned FINAL_VALUE        = 20
+    parameter              FINAL_VALUE_SOURCE = "PORT", // "PARAMETER"  // "PORT"
+    parameter int unsigned FINAL_VALUE        = 2**8 - 1
 )
 (
     input  logic                         i_clk,
-    input  logic                         i_reset,
-    input  logic                         i_enable,
-    input  logic [COUNTER_WIDTH - 1 : 0] i_final_value,
-    output logic [COUNTER_WIDTH - 1 : 0] o_value
+                                         i_reset,
+                                         i_enable,
+           logic [COUNTER_WIDTH - 1 : 0] i_final_value,
+    output logic [COUNTER_WIDTH - 1 : 0] o_value,
+           logic                         o_final_value_reached
 );
     // -----------------------------------------------
     // Declarations
+    // Counter value output
     logic [COUNTER_WIDTH - 1 : 0] cn = '0;
-    logic final_value_reached,
-          counter_reset;
+    
+    logic final_value_reached,   // Reset when counter reached it's final value
+          counter_reset;         // Counter reset signal
     
     // -----------------------------------------------
     // Basic logic
@@ -93,6 +96,7 @@ module counter
     // -----------------------------------------------
     // Assign block
     assign o_value = cn;
+    assign o_final_value_reached = final_value_reached;
     
 endmodule : counter
 /*
@@ -100,14 +104,15 @@ endmodule : counter
     #(
         .COUNTER_WIDTH      (      8      ),
         .FINAL_VALUE_SOURCE ( "PARAMETER" ), // "PARAMETER"  // "PORT"
-        .FINAL_VALUE        (     20      )
+        .FINAL_VALUE        (   2**8 - 1  )
     )
     counter_inst
     (
-        .i_clk         ( ),
-        .i_reset       ( ),
-        .i_enable      ( ),
-        .i_final_value ( ),
-        .o_value       ( )
+        .i_clk                 ( ),
+        .i_reset               ( ),
+        .i_enable              ( ),
+        .i_final_value         ( ),
+        .o_value               ( ),
+        .o_final_value_reached ( )
     );
 */
