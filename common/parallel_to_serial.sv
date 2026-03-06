@@ -41,7 +41,7 @@ module parallel_to_serial
     logic [INPUT_WIDTH - 1 : 0] iternal_register = '0;
     // -----------------------------------------------
     // Basic logic
-    always_ff @(posedge i_clk) begin : delay
+    always_ff @(posedge i_clk) begin
         if (i_latch) begin
             iternal_register <= i_parallel_data;
         end
@@ -57,7 +57,7 @@ module parallel_to_serial
                 end
             end
         end
-    end : delay
+    end
     // -----------------------------------------------
     // Assign block
     if (BIT_ORDER == "MSB") begin

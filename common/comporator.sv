@@ -1,14 +1,10 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
 // Engineer: Polikarpov D. A.
 // 
 // Create Date: 02.03.2026 20:09:01
-// Design Name: 
 // Module Name: comporator
 // Project Name: common_module
-// Target Devices: 
-// Tool Versions: 
 // Description: 
 // * general comporator
 // Dependencies: 

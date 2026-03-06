@@ -1,23 +1,20 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
 // Engineer: Polikarpov D. A.
 // 
 // Create Date: 23.08.2025 10:23:27
-// Design Name: 
 // Module Name: BRAM
 // Project Name: common_module
-// Target Devices: 
-// Tool Versions: 
 // Description: 
 // * Basic counter
 // Dependencies: 
-// 
+// * comporator.sv
 // Revision:
 // Revision 0.01 - File Created
 //          0.02 - First version of module
 //          0.03 - Parameter final value
 //          0.04 - Port final value
+//          0.04 - Final value pulse
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////

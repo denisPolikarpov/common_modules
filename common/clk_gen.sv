@@ -1,23 +1,20 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
 // Engineer: Polikarpov D. A.
 // 
 // Create Date: 02.03.2026 20:09:01
-// Design Name: 
 // Module Name: clk_gen
 // Project Name: common_module
-// Target Devices: 
-// Tool Versions: 
 // Description: 
-// 
+// * Generate clock signal
 // Dependencies: 
-// 
+// * counter.sv
+// * comporator.sv
 // Revision:
 // Revision 0.01 - File Created
 // Revision 0.02 - First version of module
 // Additional Comments:
-// 
+// * 
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -28,7 +25,7 @@ module clk_gen
 )
 (
     input  logic i_clk,
-    input  logic i_enable,
+                 i_enable,
     output logic o_gen_clk
 );
     // -----------------------------------------------
@@ -75,3 +72,16 @@ module clk_gen
     assign o_gen_clk = half_period;
     
 endmodule : clk_gen
+/*
+    clk_gen
+    #(
+        .MAIN_CLK_FREQ ( 120000000 ),
+        .REQ_CLK_FREQ  ( 20000000  )
+    )
+    clk_gen_inst
+    (
+        .i_clk     ( ),
+        .i_enable  ( ),
+        .o_gen_clk ( )
+    );
+*/
