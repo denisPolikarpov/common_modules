@@ -63,9 +63,11 @@ endmodule : serial_to_parallel
         .INPUT_WIDTH (   16  ),
         .BIT_ORDER   ( "MSB" )   // "MSB"  // "LSB"
     )
+    serial_to_parallel_inst
     (
         .i_clk           ( ),
         .i_serial        ( ),
+        .i_reset         ( ),
         .i_enable        ( ),
         .o_parallel_data ( )
     );

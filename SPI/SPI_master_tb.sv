@@ -22,23 +22,20 @@
 
 module SPI_master_tb();
     
-    localparam int unsigned INPUT_WIDTH = 16;
+    localparam int unsigned INPUT_WIDTH = 8;
     
     logic i_clk, 
-          i_start;
-//          CSn,
-//          SCLK,
-//          MOSI,
-//          MISO = '0;
+          i_start,
+          o_data_valid;
           
     SPI_intr intr_SPI_master();
     
-//    assign CSn  = intr_SPI_master.CSn;
-//    assign SCLK = intr_SPI_master.SCLK;
-//    assign MOSI = intr_SPI_master.MOSI;
-//    assign intr_SPI_master.MISO = MISO;
+    logic [INPUT_WIDTH - 1 : 0] data_to_MISO [1 : 0] = '{'hB4, 'hC3};
+    logic [2 : 0] curr_bit_num = '0;
+    logic next_seq = '0;
     
-    logic [INPUT_WIDTH - 1 : 0] i_data = 'hADC5;
+    logic [INPUT_WIDTH - 1 : 0] i_data = 'hAD,
+                                o_recieved_data;
     
     SPI_master
     #(
@@ -50,11 +47,7 @@ module SPI_master_tb();
     )
     SPI_master_DUT
     (
-        .*,
-        .intr_SPI_master ( intr_SPI_master ),
-        // Recieved data
-        .o_recieved_data ( ),
-        .o_data_valid    ( )
+        .*
     );
     
     initial begin
@@ -63,9 +56,9 @@ module SPI_master_tb();
     end
     
     initial begin
-        i_data <= 'hADC5;
+        i_data <= 'hAD;
         #1205
-        i_data <= 'h5CDA;
+        i_data <= 'h5C;
     end
     
     initial begin
@@ -78,6 +71,14 @@ module SPI_master_tb();
         i_start <= '1;
         #2
         i_start <= '0;
+    end
+    
+    always @(negedge intr_SPI_master.SCLK) begin
+        intr_SPI_master.MISO <= data_to_MISO[next_seq][curr_bit_num];
+        curr_bit_num <= curr_bit_num + 'b1;
+        if (curr_bit_num == 'd7) begin
+            next_seq <= ~next_seq;
+        end
     end
     
 endmodule : SPI_master_tb

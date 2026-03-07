@@ -7,9 +7,12 @@
 // Module Name: SPI_master
 // Project Name: SPI
 // Description: 
-// * Basic SPI master module/
+// * Basic SPI master module
 // Dependencies: 
-// 
+// * counter.sv
+// * parallel_to_serial.sv
+// * edge_sense.sv
+// * clk_gen.sv
 // Revision:
 // Revision 0.01 - File Created
 //          0.02 - First version of SPI (SCLK always in work)
@@ -24,7 +27,8 @@ module SPI_master
     parameter int unsigned MAIN_CLK_FREQ  = 120000000,
     parameter int unsigned SCLK_FREQ      = 20000000,
     parameter              SCLK_NOT_END   = "YES",     // "YES"    // "NO"
-    parameter              TRANSMIT_ORDER = "MSB"      // "MSB"    // "LSB"
+    parameter              TRANSMIT_ORDER = "MSB",     // "MSB"    // "LSB"
+    parameter              RECIEVED_ORDER = "MSB"      // "MSB"    // "LSB"
 )
 (
     input  logic i_clk,
@@ -42,15 +46,21 @@ module SPI_master
     localparam int unsigned TRANS_BIT_CN_FINAL = INPUT_WIDTH - 1;
     localparam int unsigned TRANS_BIT_CN_WIDTH = $clog2(TRANS_BIT_CN_FINAL) + 1;
     // Declaration of variables
-    logic enable_SCLK_gen    = '0,
-          reset_trans_bit_cn = '0,
-          enable_shifting    = '0,
-          latch_data         = '0,
+    logic enable_SCLK_gen       = '0,
+          reset_trans_bit_cn    = '0,
+          enable_shifting       = '0,
+          latch_data            = '0,
+          reset_MISO_ser_to_par = '0,
+          latch_recieved_data   = '0, 
           generated_SCLK,
           falling_edge_detected,
-          shift_register,
+          rising_edge_detected,
+          MOSI_shift_register,
+          MISO_shift_register,
           enable_trans_bit_cn,
           trans_bit_cn_finished;
+    logic [INPUT_WIDTH - 1 : 0] recieved_data_reg = '0,
+                                recieved_data_wire;
     // ------------------------------------------------------------
     // FSM
     enum logic [3 : 0] {
@@ -64,105 +74,141 @@ module SPI_master
         unique case(fsm_state)
             IDLE_STATE : begin
                 if (i_start) begin
-                    fsm_state           <= NEXT_FALL_STATE;
+                    fsm_state             <= NEXT_FALL_STATE;
                     
-                    intr_SPI_master.CSn <= '1;
-                    reset_trans_bit_cn  <= '1;
-                    latch_data          <= '1;
-                    enable_shifting     <= '0;
+                    intr_SPI_master.CSn   <= '1;
+                    reset_trans_bit_cn    <= '1;
+                    latch_data            <= '1;
+                    enable_shifting       <= '0;
+                    reset_MISO_ser_to_par <= '1;
+                    latch_recieved_data   <= '0;
                 end
                 else begin
-                    fsm_state           <= IDLE_STATE;
+                    fsm_state             <= IDLE_STATE;
                     
-                    intr_SPI_master.CSn <= '1;
-                    reset_trans_bit_cn  <= '1;
-                    latch_data          <= '0;
-                    enable_shifting     <= '0;
+                    intr_SPI_master.CSn   <= '1;
+                    reset_trans_bit_cn    <= '1;
+                    latch_data            <= '0;
+                    enable_shifting       <= '0;
+                    reset_MISO_ser_to_par <= '1;
+                    latch_recieved_data   <= '0;
                 end
             end
             NEXT_FALL_STATE : begin
                 if (falling_edge_detected) begin
-                    fsm_state           <= TRANS_STATE;
+                    fsm_state             <= TRANS_STATE;
                     
-                    intr_SPI_master.CSn <= '0;
-                    reset_trans_bit_cn  <= '0;
-                    latch_data          <= '0;
-                    enable_shifting     <= '1;
+                    intr_SPI_master.CSn   <= '0;
+                    reset_trans_bit_cn    <= '0;
+                    latch_data            <= '0;
+                    enable_shifting       <= '1;
+                    reset_MISO_ser_to_par <= '0;
+                    latch_recieved_data   <= '0;
                 end
                 else begin
-                    fsm_state           <= NEXT_FALL_STATE;
+                    fsm_state             <= NEXT_FALL_STATE;
                     
-                    intr_SPI_master.CSn <= '1;
-                    reset_trans_bit_cn  <= '1;
-                    latch_data          <= '0;
-                    enable_shifting     <= '0;
+                    intr_SPI_master.CSn   <= '1;
+                    reset_trans_bit_cn    <= '1;
+                    latch_data            <= '0;
+                    enable_shifting       <= '0;
+                    reset_MISO_ser_to_par <= '1;
+                    latch_recieved_data   <= '0;
                 end
             end
             TRANS_STATE : begin
                 if (trans_bit_cn_finished) begin
-                    fsm_state           <= LAST_BIT_STATE;
+                    fsm_state             <= LAST_BIT_STATE;
                     
-                    intr_SPI_master.CSn <= '0;
-                    reset_trans_bit_cn  <= '1;
-                    latch_data          <= '0;
-                    enable_shifting     <= '1;
+                    intr_SPI_master.CSn   <= '0;
+                    reset_trans_bit_cn    <= '1;
+                    latch_data            <= '0;
+                    enable_shifting       <= '1;
+                    reset_MISO_ser_to_par <= '0;
+                    latch_recieved_data   <= '0;
                 end
                 else begin
-                    fsm_state           <= TRANS_STATE;
+                    fsm_state             <= TRANS_STATE;
                     
-                    intr_SPI_master.CSn <= '0;
-                    reset_trans_bit_cn  <= '0;
-                    latch_data          <= '0;
-                    enable_shifting     <= '1;
+                    intr_SPI_master.CSn   <= '0;
+                    reset_trans_bit_cn    <= '0;
+                    latch_data            <= '0;
+                    enable_shifting       <= '1;
+                    reset_MISO_ser_to_par <= '0;
+                    latch_recieved_data   <= '0;
                 end
             end
             LAST_BIT_STATE : begin
                 if (falling_edge_detected) begin
                     if (i_start) begin
-                        fsm_state           <= TRANS_STATE;
+                        fsm_state             <= TRANS_STATE;
                         
-                        intr_SPI_master.CSn <= '0;
-                        reset_trans_bit_cn  <= '0;
-                        latch_data          <= '1;
-                        enable_shifting     <= '1;
+                        intr_SPI_master.CSn   <= '0;
+                        reset_trans_bit_cn    <= '0;
+                        latch_data            <= '1;
+                        enable_shifting       <= '1;
+                        reset_MISO_ser_to_par <= '1;
+                        latch_recieved_data   <= '1;
                     end
                     else begin
-                        fsm_state           <= IDLE_STATE;
+                        fsm_state             <= IDLE_STATE;
                         
-                        intr_SPI_master.CSn <= '1;
-                        reset_trans_bit_cn  <= '1;
-                        latch_data          <= '0;
-                        enable_shifting     <= '0;
+                        intr_SPI_master.CSn   <= '1;
+                        reset_trans_bit_cn    <= '1;
+                        latch_data            <= '0;
+                        enable_shifting       <= '0;
+                        reset_MISO_ser_to_par <= '0;
+                        latch_recieved_data   <= '1;
                     end
                 end
                 else begin
-                    fsm_state           <= LAST_BIT_STATE;
+                    fsm_state             <= LAST_BIT_STATE;
                     
-                    intr_SPI_master.CSn <= '0;
-                    reset_trans_bit_cn  <= '1;
-                    latch_data          <= '0;
-                    enable_shifting     <= '1;
+                    intr_SPI_master.CSn   <= '0;
+                    reset_trans_bit_cn    <= '1;
+                    latch_data            <= '0;
+                    enable_shifting       <= '1;
+                    reset_MISO_ser_to_par <= '0;
+                    latch_recieved_data   <= '0;
                 end
             end
         endcase
     end : fsm
     // ------------------------------------------------------------
-    // Input shift register
-    assign shift_register = enable_shifting & falling_edge_detected;
+    // MOSI shift register
+    assign MOSI_shift_register = enable_shifting & falling_edge_detected;
     
     parallel_to_serial
     #(
         .INPUT_WIDTH (  INPUT_WIDTH   ),
         .BIT_ORDER   ( TRANSMIT_ORDER )  // "MSB" // "LSB"
     )
-    parallel_to_serial_inst
+    parallel_to_serial_MOSI
     (
         .i_clk,
         .i_parallel_data (        i_data        ),
         .i_latch         (      latch_data      ),
-        .i_shift         (    shift_register    ),
+        .i_shift         (  MOSI_shift_register ),
         .o_serial_data   ( intr_SPI_master.MOSI )
     );
+    // ------------------------------------------------------------
+    // MISO shift register
+    assign MISO_shift_register = enable_shifting & rising_edge_detected;
+    
+    serial_to_parallel
+    #(
+        .INPUT_WIDTH (   INPUT_WIDTH  ),
+        .BIT_ORDER   ( RECIEVED_ORDER )   // "MSB"  // "LSB"
+    )
+    serial_to_parallel_MISO
+    (
+        .i_clk,
+        .i_serial        (  intr_SPI_master.MISO ),
+        .i_reset         ( reset_MISO_ser_to_par ),
+        .i_enable        (  MISO_shift_register  ),
+        .o_parallel_data (   recieved_data_wire  )
+    );
+    
     // ------------------------------------------------------------
     // Counter to count amount of transmitted bits
     assign enable_trans_bit_cn = ~reset_trans_bit_cn & falling_edge_detected;
@@ -188,11 +234,22 @@ module SPI_master
     #(
         .EDGE_TO_DETECT ( "FALLING" )         // "RISING" // "FALLING" // "BOTH"
     )
-    edge_sense_inst
+    SPI_SCLK_fall_edge
     (
         .i_clk,
         .i_signal (     generated_SCLK    ),
         .o_detect ( falling_edge_detected )
+    );
+    
+    edge_sense
+    #(
+        .EDGE_TO_DETECT ( "RISING" )         // "RISING" // "FALLING" // "BOTH"
+    )
+    SPI_SCLK_rise_edge
+    (
+        .i_clk,
+        .i_signal (    generated_SCLK    ),
+        .o_detect ( rising_edge_detected )
     );
     // ------------------------------------------------------------
     // SCLK generation
@@ -222,10 +279,20 @@ module SPI_master
             .o_gen_clk (  generated_SCLK )
         );
     end
+    // ------------------------------------------------------------
+    // Output signal logic
+    always_ff @(posedge i_clk) begin : recieved_data_register
+        if (latch_recieved_data) begin
+            recieved_data_reg <= recieved_data_wire; 
+        end
+    end : recieved_data_register
     
-    always_ff @(posedge i_clk) begin : delay_SCLK
+    always_ff @(posedge i_clk) begin : delay
+        o_data_valid         <= latch_recieved_data;
         intr_SPI_master.SCLK <= generated_SCLK;
-    end : delay_SCLK
+    end : delay
+    
+    assign o_recieved_data = recieved_data_reg;
     
 endmodule : SPI_master
 /*
@@ -237,6 +304,7 @@ endmodule : SPI_master
         .SCLK_NOT_END   (   "YES"   ),     // "YES"    // "NO"
         .TRANSMIT_ORDER (   "MSB"   )      // "MSB"    // "LSB"
     )
+    SPI_master_inst
     (
         .i_clk ( ),
         // SPI master interface 
