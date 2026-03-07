@@ -1,18 +1,16 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: Polikarpov D. A.
 // 
 // Create Date: 23.08.2025 10:23:27
-// Design Name: 
 // Module Name: BRAM
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
+// Project Name: Memories
+// Target Devices: Zynq, Artix, etc.
 // Description: 
-// 
+// * Module discribe Xilinx BRAM primitive
 // Dependencies: 
-// 
+// * BRAM_memory_intr.sv
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
@@ -107,3 +105,17 @@ module BRAM
     end
     
 endmodule : BRAM
+/*
+    BRAM
+    #(
+        .MEMORY_DEPTH     (        512        ),
+        .MEMORY_WIDTH     (         16        ),
+        .TYPE_OF_MEMORY   ( "HIGH_PERFOMANCE" ),   // "LOW_LATENCY"         // "HIGH_PERFOMANCE"
+        .MEMORY_INIT_FILE (         ""        )
+    )
+    BRAM_inst
+    (
+        .mem_bus_a ( ),
+        .mem_bus_b ( )
+    );
+*/
