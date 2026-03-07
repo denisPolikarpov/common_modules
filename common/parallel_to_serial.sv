@@ -4,11 +4,8 @@
 // Engineer:  Polikarpov D. A.
 // 
 // Create Date: 02.03.2026 19:40:46
-// Design Name: 
 // Module Name: parallel_to_serial
 // Project Name: common_module
-// Target Devices: 
-// Tool Versions: 
 // Description: 
 // * Module transforms parallel data to serial
 // Dependencies: 

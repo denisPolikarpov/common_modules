@@ -1,16 +1,14 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: Polikarpov D. A.
 // 
 // Create Date: 29.08.2025 18:42:33
-// Design Name: 
-// Module Name: memory_intr
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
+// Module Name: BRAM_memory_intr
+// Project Name: Memories
+// Target Devices: Zynq, Artix, etc.
 // Description: 
-// 
+// * BRAM interface
 // Dependencies: 
 // 
 // Revision:
@@ -57,6 +55,25 @@ interface BRAM_memory_intr
         input  en,
         input  rst,
         input  we
-    );
-                          
+    );                 
 endinterface : BRAM_memory_intr
+/*
+    BRAM_memory_intr
+    #(
+        .DATA_WIDTH    (  16 ),
+        .ADDRESS_WIDTH ( 256 )
+    ) 
+    BRAM_memory_intr_inst
+    ( 
+        .clk ( )
+    );
+
+    // Signals
+    BRAM_memory_intr_inst.addr
+    BRAM_memory_intr_inst.clk
+    BRAM_memory_intr_inst.din
+    BRAM_memory_intr_inst.dout
+    BRAM_memory_intr_inst.en
+    BRAM_memory_intr_inst.rst
+    BRAM_memory_intr_inst.we
+*/
