@@ -14,14 +14,19 @@
 //          0.02 - First version of module
 //          0.03 - Parameter final value
 //          0.04 - Port final value
-//          0.04 - Final value pulse
+//          0.05 - Final value pulse
+//          0.06 - Start value
 // Additional Comments:
-// 
+// * Module allows to choose source for start and final values by counter
+// * START_VALUE_SOURCE and FINAL_VALUE_SOURCE respectively. Counter is reseted to
+// * start value.
 //////////////////////////////////////////////////////////////////////////////////
 
 module counter
 #(
     parameter int unsigned COUNTER_WIDTH      = 8,
+    parameter              START_VALUE_SOURCE = "PORT", // "PARAMETER"  // "PORT"
+    parameter int unsigned START_VALUE        = 0,
     parameter              FINAL_VALUE_SOURCE = "PORT", // "PARAMETER"  // "PORT"
     parameter int unsigned FINAL_VALUE        = 2**8 - 1
 )
@@ -29,6 +34,7 @@ module counter
     input  logic                         i_clk,
                                          i_reset,
                                          i_enable,
+           logic [COUNTER_WIDTH - 1 : 0] i_start_value,
            logic [COUNTER_WIDTH - 1 : 0] i_final_value,
     output logic [COUNTER_WIDTH - 1 : 0] o_value,
            logic                         o_final_value_reached
@@ -37,6 +43,15 @@ module counter
     // Declarations
     // Counter value output
     logic [COUNTER_WIDTH - 1 : 0] cn = '0;
+    
+    initial begin
+        if (START_VALUE_SOURCE == "PARAMETER") begin
+            cn = START_VALUE;
+        end
+        else if (START_VALUE_SOURCE == "PORT") begin
+            cn = i_start_value;
+        end
+    end
     
     logic final_value_reached,   // Reset when counter reached it's final value
           counter_reset;         // Counter reset signal
@@ -47,7 +62,12 @@ module counter
     
     always_ff @(posedge i_clk) begin : counter_logic
         if (counter_reset) begin
-            cn <= '0;
+            if (START_VALUE_SOURCE == "PARAMETER") begin
+                cn <= START_VALUE;
+            end
+            else if (START_VALUE_SOURCE == "PORT") begin
+                cn <= i_start_value;
+            end
         end
         else begin
             if (i_enable) begin
@@ -100,7 +120,9 @@ endmodule : counter
     counter
     #(
         .COUNTER_WIDTH      (      8      ),
-        .FINAL_VALUE_SOURCE ( "PARAMETER" ), // "PARAMETER"  // "PORT"
+        .START_VALUE_SOURCE ( "PARAMETER" ),  // "PARAMETER"  // "PORT"
+        .START_VALUE        (      0      ),
+        .FINAL_VALUE_SOURCE ( "PARAMETER" ),  // "PARAMETER"  // "PORT"
         .FINAL_VALUE        (   2**8 - 1  )
     )
     counter_inst
@@ -108,6 +130,7 @@ endmodule : counter
         .i_clk                 ( ),
         .i_reset               ( ),
         .i_enable              ( ),
+        .i_start_value         ( ),
         .i_final_value         ( ),
         .o_value               ( ),
         .o_final_value_reached ( )

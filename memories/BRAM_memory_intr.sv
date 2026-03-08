@@ -20,9 +20,9 @@
 
 interface BRAM_memory_intr
 #(
-    parameter int unsigned DATA_WIDTH    = 16,
-    parameter int unsigned ADDRESS_WIDTH = 256,
-    localparam int unsigned WE_WIDTH = DATA_WIDTH / 4
+    parameter int unsigned  DATA_WIDTH    = 16,
+    parameter int unsigned  ADDRESS_WIDTH = 256,
+    localparam int unsigned WE_WIDTH      = DATA_WIDTH / 8
 ) 
 ( 
     input logic clk
