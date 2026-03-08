@@ -197,8 +197,8 @@ module SPI_master
     
     serial_to_parallel
     #(
-        .INPUT_WIDTH (   INPUT_WIDTH  ),
-        .BIT_ORDER   ( RECIEVED_ORDER )   // "MSB"  // "LSB"
+        .OUTPUT_WIDTH (   INPUT_WIDTH  ),
+        .BIT_ORDER    ( RECIEVED_ORDER )   // "MSB"  // "LSB"
     )
     serial_to_parallel_MISO
     (

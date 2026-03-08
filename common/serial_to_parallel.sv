@@ -20,19 +20,19 @@
 
 module serial_to_parallel
 #(
-    parameter int unsigned INPUT_WIDTH = 16,
-    parameter              BIT_ORDER   = "MSB"   // "MSB"  // "LSB"
+    parameter int unsigned OUTPUT_WIDTH = 16,
+    parameter              BIT_ORDER    = "MSB"   // "MSB"  // "LSB"
 )
 (
-    input  logic                       i_clk,
-                                       i_serial,
-                                       i_reset,
-                                       i_enable,
-    output logic [INPUT_WIDTH - 1 : 0] o_parallel_data
+    input  logic                        i_clk,
+                                        i_serial,
+                                        i_reset,
+                                        i_enable,
+    output logic [OUTPUT_WIDTH - 1 : 0] o_parallel_data
 );
     // -----------------------------------------------
     // Declarations
-    logic [INPUT_WIDTH - 1 : 0] iternal_register = '0;
+    logic [OUTPUT_WIDTH - 1 : 0] iternal_register = '0;
     // -----------------------------------------------
     // Basic logic
     always_ff @(posedge i_clk) begin
@@ -42,12 +42,12 @@ module serial_to_parallel
         else begin
             if (i_enable) begin
                 if (BIT_ORDER == "MSB") begin
-                    iternal_register[0]                   <= i_serial;
-                    iternal_register[INPUT_WIDTH - 1 : 1] <= iternal_register[INPUT_WIDTH - 2 : 0];
+                    iternal_register[0]                    <= i_serial;
+                    iternal_register[OUTPUT_WIDTH - 1 : 1] <= iternal_register[OUTPUT_WIDTH - 2 : 0];
                 end
                 else if (BIT_ORDER == "LSB") begin
-                    iternal_register[INPUT_WIDTH - 1]     <= i_serial;
-                    iternal_register[INPUT_WIDTH - 2 : 0] <= iternal_register[INPUT_WIDTH - 1 : 1];
+                    iternal_register[OUTPUT_WIDTH - 1]     <= i_serial;
+                    iternal_register[OUTPUT_WIDTH - 2 : 0] <= iternal_register[OUTPUT_WIDTH - 1 : 1];
                 end
             end
         end
@@ -60,8 +60,8 @@ endmodule : serial_to_parallel
 /*
     serial_to_parallel
     #(
-        .INPUT_WIDTH (   16  ),
-        .BIT_ORDER   ( "MSB" )   // "MSB"  // "LSB"
+        .OUTPUT_WIDTH (   16  ),
+        .BIT_ORDER    ( "MSB" )   // "MSB"  // "LSB"
     )
     serial_to_parallel_inst
     (
