@@ -40,6 +40,8 @@ module clk_gen
     counter
     #(
         .COUNTER_WIDTH      (     CN_WIDTH    ),
+        .START_VALUE_SOURCE (   "PARAMETER"   ),  // "PARAMETER"  // "PORT"
+        .START_VALUE        (        0        ),
         .FINAL_VALUE_SOURCE (   "PARAMETER"   ), // "PARAMETER"  // "PORT"
         .FINAL_VALUE        (  CLK_RATIO - 1  )  
     )
@@ -48,6 +50,7 @@ module clk_gen
         .i_clk,
         .i_reset       (   ~i_enable   ),
         .i_enable      (    i_enable   ),
+        .i_start_value (       '0      ),
         .i_final_value (       '0      ),
         .o_value       (   cn_output   )
     );

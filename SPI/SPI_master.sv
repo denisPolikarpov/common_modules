@@ -216,6 +216,8 @@ module SPI_master
     counter
     #(
         .COUNTER_WIDTH      ( TRANS_BIT_CN_WIDTH ),
+        .START_VALUE_SOURCE (     "PARAMETER"    ),  // "PARAMETER"  // "PORT"
+        .START_VALUE        (          0         ),
         .FINAL_VALUE_SOURCE (     "PARAMETER"    ), // "PARAMETER"  // "PORT"
         .FINAL_VALUE        ( TRANS_BIT_CN_FINAL )
     )
@@ -224,6 +226,7 @@ module SPI_master
         .i_clk,
         .i_reset               (   reset_trans_bit_cn  ),
         .i_enable              (  enable_trans_bit_cn  ),
+        .i_start_value         (           '0          ),
         .i_final_value         (           '0          ),
         .o_value               (                       ),
         .o_final_value_reached ( trans_bit_cn_finished )
