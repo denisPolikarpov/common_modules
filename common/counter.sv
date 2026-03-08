@@ -14,20 +14,17 @@
 //          0.02 - First version of module
 //          0.03 - Parameter final value
 //          0.04 - Port final value
-//          0.05 - Final value pulse
-//          0.06 - Start value
+//          0.04 - Final value pulse
 // Additional Comments:
-// * Module allows to choose source for start and final values by counter
-// * START_VALUE_SOURCE and FINAL_VALUE_SOURCE respectively. Counter is reseted to
-// * start value.
+// 
 //////////////////////////////////////////////////////////////////////////////////
 
 module counter
 #(
     parameter int unsigned COUNTER_WIDTH      = 8,
-    parameter              START_VALUE_SOURCE = "PORT", // "PARAMETER"  // "PORT"
+    parameter              START_VALUE_SOURCE = "PARAMETER", // "PARAMETER"  // "PORT"
     parameter int unsigned START_VALUE        = 0,
-    parameter              FINAL_VALUE_SOURCE = "PORT", // "PARAMETER"  // "PORT"
+    parameter              FINAL_VALUE_SOURCE = "PARAMETER", // "PARAMETER"  // "PORT"
     parameter int unsigned FINAL_VALUE        = 2**8 - 1
 )
 (
