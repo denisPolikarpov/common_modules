@@ -11,13 +11,16 @@
 // Dependencies: 
 // * counter.sv
 // * parallel_to_serial.sv
+// * serial_to_parallel.sv
 // * edge_sense.sv
 // * clk_gen.sv
 // Revision:
 // Revision 0.01 - File Created
 //          0.02 - First version of SPI (SCLK always in work)
+//          0.03 - Transfer signal is added
 // Additional Comments:
 // * Module supports type of SPI, when SCLK always in work
+// * o_transfer_active is n HIGH state? when bits are actively transmitiing
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -39,7 +42,8 @@ module SPI_master
            logic                       i_start,
     // Recieved data
     output logic [INPUT_WIDTH - 1 : 0] o_recieved_data,
-           logic                       o_data_valid
+           logic                       o_data_valid,
+                                       o_transfer_active
 );
     // ------------------------------------------------------------
     // Constants calculations
@@ -82,6 +86,7 @@ module SPI_master
                     enable_shifting       <= '0;
                     reset_MISO_ser_to_par <= '1;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '0;
                 end
                 else begin
                     fsm_state             <= IDLE_STATE;
@@ -92,6 +97,7 @@ module SPI_master
                     enable_shifting       <= '0;
                     reset_MISO_ser_to_par <= '1;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '0;
                 end
             end
             NEXT_FALL_STATE : begin
@@ -104,6 +110,7 @@ module SPI_master
                     enable_shifting       <= '1;
                     reset_MISO_ser_to_par <= '0;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '0;
                 end
                 else begin
                     fsm_state             <= NEXT_FALL_STATE;
@@ -114,6 +121,7 @@ module SPI_master
                     enable_shifting       <= '0;
                     reset_MISO_ser_to_par <= '1;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '0;
                 end
             end
             TRANS_STATE : begin
@@ -126,6 +134,7 @@ module SPI_master
                     enable_shifting       <= '1;
                     reset_MISO_ser_to_par <= '0;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '0;
                 end
                 else begin
                     fsm_state             <= TRANS_STATE;
@@ -136,6 +145,7 @@ module SPI_master
                     enable_shifting       <= '1;
                     reset_MISO_ser_to_par <= '0;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '1;
                 end
             end
             LAST_BIT_STATE : begin
@@ -149,6 +159,7 @@ module SPI_master
                         enable_shifting       <= '1;
                         reset_MISO_ser_to_par <= '1;
                         latch_recieved_data   <= '1;
+                        o_transfer_active     <= '0;
                     end
                     else begin
                         fsm_state             <= IDLE_STATE;
@@ -159,6 +170,7 @@ module SPI_master
                         enable_shifting       <= '0;
                         reset_MISO_ser_to_par <= '0;
                         latch_recieved_data   <= '1;
+                        o_transfer_active     <= '0;
                     end
                 end
                 else begin
@@ -170,6 +182,7 @@ module SPI_master
                     enable_shifting       <= '1;
                     reset_MISO_ser_to_par <= '0;
                     latch_recieved_data   <= '0;
+                    o_transfer_active     <= '0;
                 end
             end
         endcase
@@ -316,7 +329,8 @@ endmodule : SPI_master
         .i_data  ( ),
         .i_start ( ),
         // Recieved data
-        .o_recieved_data ( ),
-        .o_data_valid    ( )
+        .o_recieved_data   ( ),
+        .o_data_valid      ( ),
+        .o_transfer_active ( )
     );
 */
