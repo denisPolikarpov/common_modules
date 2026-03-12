@@ -45,7 +45,7 @@ module SPI_master
            logic                       o_data_valid,
                                        o_transfer_active
 );
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Constants calculations
     localparam int unsigned TRANS_BIT_CN_FINAL = INPUT_WIDTH - 1;
     localparam int unsigned TRANS_BIT_CN_WIDTH = $clog2(TRANS_BIT_CN_FINAL) + 1;
@@ -65,7 +65,7 @@ module SPI_master
           trans_bit_cn_finished;
     logic [INPUT_WIDTH - 1 : 0] recieved_data_reg = '0,
                                 recieved_data_wire;
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // FSM
     enum logic [3 : 0] {
         IDLE_STATE      = 4'b0001,
@@ -187,7 +187,7 @@ module SPI_master
             end
         endcase
     end : fsm
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // MOSI shift register
     assign MOSI_shift_register = enable_shifting & falling_edge_detected;
     
@@ -204,7 +204,7 @@ module SPI_master
         .i_shift         (  MOSI_shift_register ),
         .o_serial_data   ( intr_SPI_master.MOSI )
     );
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // MISO shift register
     assign MISO_shift_register = enable_shifting & rising_edge_detected;
     
@@ -222,7 +222,7 @@ module SPI_master
         .o_parallel_data (   recieved_data_wire  )
     );
     
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Counter to count amount of transmitted bits
     assign enable_trans_bit_cn = ~reset_trans_bit_cn & falling_edge_detected;
     
@@ -244,7 +244,7 @@ module SPI_master
         .o_value               (                       ),
         .o_final_value_reached ( trans_bit_cn_finished )
     );
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Detect SCLK falling edges
     edge_sense
     #(
@@ -267,7 +267,7 @@ module SPI_master
         .i_signal (    generated_SCLK    ),
         .o_detect ( rising_edge_detected )
     );
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // SCLK generation
     if (SCLK_NOT_END == "YES") begin
         clk_gen
@@ -295,7 +295,7 @@ module SPI_master
             .o_gen_clk (  generated_SCLK )
         );
     end
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Output signal logic
     always_ff @(posedge i_clk) begin : recieved_data_register
         if (latch_recieved_data) begin
