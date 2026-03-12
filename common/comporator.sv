@@ -36,7 +36,7 @@ module comporator
     input  logic signed [INPUT_WIDTH - 1 : 0] i_compare_with,
     output logic                              o_compare_results
 );
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Declarations
     logic compare_results;
     logic signed [INPUT_WIDTH - 1 : 0] compare_with;
@@ -44,12 +44,14 @@ module comporator
     logic optional_output_register = '0;
     
     if (CONSTANT_OR_SIGNAL == "CONSTANT") begin
-        assign compare_with = COMPARE_CONSTANT;
+        initial begin
+            compare_with = COMPARE_CONSTANT;
+        end
     end
     else if (CONSTANT_OR_SIGNAL == "SIGNAL") begin
         assign compare_with = i_compare_with;
     end
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Compare logic
     if (OPPERATION_TYPE == "GT") begin
         assign compare_results = i_signal > compare_with ? 1'b1 : 1'b0;
@@ -64,9 +66,9 @@ module comporator
         assign compare_results = i_signal <= compare_with ? 1'b1 : 1'b0;
     end
     else if (OPPERATION_TYPE == "EQ") begin
-        assign compare_results = i_signal == compare_with ? 1'b1 : 1'b0;
+       assign compare_results = i_signal == compare_with ? 1'b1 : 1'b0;
     end
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Output logic
     if (REGISTER_OUTPUT == "REGISTER") begin
         always_ff @(posedge i_clk) begin : register

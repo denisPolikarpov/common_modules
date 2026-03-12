@@ -36,7 +36,7 @@ module counter
     output logic [COUNTER_WIDTH - 1 : 0] o_value,
            logic                         o_final_value_reached
 );
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Declarations
     // Counter value output
     logic [COUNTER_WIDTH - 1 : 0] cn = '0;
@@ -53,7 +53,7 @@ module counter
     logic final_value_reached,   // Reset when counter reached it's final value
           counter_reset;         // Counter reset signal
     
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Basic logic
     assign counter_reset = i_reset || final_value_reached;
     
@@ -107,7 +107,7 @@ module counter
             .o_compare_results ( final_value_reached )
         );
     end
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Assign block
     assign o_value = cn;
     assign o_final_value_reached = final_value_reached;

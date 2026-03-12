@@ -27,12 +27,12 @@ module delay
            logic [INPUT_WIDTH - 1 : 0] i_signal,
     output logic [INPUT_WIDTH - 1 : 0] o_delayed
 );
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Defenition
     logic [INPUT_WIDTH - 1 : 0] iternal_register_line [DELAY_TIME : 0] = '{default : '0};
     
     genvar register_num;
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Basic logic
     always_ff @(posedge i_clk) begin : first_register
         iternal_register_line[0] <= i_signal;
@@ -45,7 +45,7 @@ module delay
             end
         end : other_registers_in_line
     end
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Assign block
     assign o_delayed = iternal_register_line[DELAY_TIME];
     

@@ -19,7 +19,8 @@
 
 module RS_latch
 #(
-    parameter bit INITIAL_VALUE = 1'b0
+    parameter bit INITIAL_VALUE = 1'b0,
+    parameter     SYNC_OR_ASYNC = "SYNC" // "SYNC"  // "ASYNC"
 )
 (
     input  logic i_clk,
@@ -27,24 +28,40 @@ module RS_latch
                  i_S,
     output logic o_Q
 );
-    logic iternal_reg = INITIAL_VALUE;
-    
-    always_ff @(posedge i_clk) begin
-        if (i_R) begin
-            iternal_reg <= '0;
+    if (SYNC_OR_ASYNC == "SYNC") begin
+        logic iternal_reg = INITIAL_VALUE;
+        
+        always_ff @(posedge i_clk) begin
+            if (i_R) begin
+                iternal_reg <= '0;
+            end
+            if (i_S) begin
+                iternal_reg <= '1;
+            end
         end
-        if (i_S) begin
-            iternal_reg <= '1;
-        end
+        
+        assign o_Q = iternal_reg;
     end
-    
-    assign o_Q = iternal_reg;
-    
+    else if (SYNC_OR_ASYNC == "ASYNC") begin
+        logic iternal_reg = INITIAL_VALUE;;
+        
+        always_latch begin
+            if (i_R) begin
+                iternal_reg <= '0;
+            end
+            if (i_S) begin
+                iternal_reg <= '1;
+            end
+        end
+        
+        assign o_Q = iternal_reg;
+    end
 endmodule : RS_latch
 /*
     RS_latch 
     #(
-        .INITIAL_VALUE ( 1'b0 )
+        .INITIAL_VALUE (  1'b0  ),
+        .SYNC_OR_ASYNC ( "SYNC" )    // "SYNC"  // "ASYNC"
     )
     RS_latch_inst
     (

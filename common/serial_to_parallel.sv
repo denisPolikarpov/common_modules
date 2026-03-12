@@ -30,10 +30,10 @@ module serial_to_parallel
                                         i_enable,
     output logic [OUTPUT_WIDTH - 1 : 0] o_parallel_data
 );
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Declarations
     logic [OUTPUT_WIDTH - 1 : 0] iternal_register = '0;
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Basic logic
     always_ff @(posedge i_clk) begin
         if (i_reset) begin
@@ -52,7 +52,7 @@ module serial_to_parallel
             end
         end
     end
-    // -----------------------------------------------
+    // ----------------------------------------------------------------------------------------------
     // Assign block
     assign o_parallel_data = iternal_register;
     
