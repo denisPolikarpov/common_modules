@@ -30,7 +30,7 @@ module BRAM
     BRAM_memory_intr.mem mem_bus_a,
     BRAM_memory_intr.mem mem_bus_b
 );
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Defenitions
     (* ram_style="block" *)
     logic [MEMORY_WIDTH - 1 : 0] memory [MEMORY_DEPTH - 1 : 0];
@@ -38,7 +38,7 @@ module BRAM
                                  readA_value_z = '0,
                                  readB_value   = '0,
                                  readB_value_z = '0;
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Init value logic
     initial begin
         if (MEMORY_INIT_FILE == "") begin
@@ -50,7 +50,7 @@ module BRAM
             $readmemh(MEMORY_INIT_FILE, memory, 0, MEMORY_DEPTH - 1);
         end
     end
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Read or write logic
     always_ff @(posedge mem_bus_a.clk) begin : memory_logic_a
         if (mem_bus_a.en) begin
@@ -74,7 +74,7 @@ module BRAM
         end
     end : memory_logic_b
     
-    // ------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------
     // Output aditional logic
     if (TYPE_OF_MEMORY == "HIGH_PERFOMANCE") begin
         always_ff @(posedge mem_bus_a.clk) begin : delay_a
